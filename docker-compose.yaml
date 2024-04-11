@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  db:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "username"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail http://localhost:8000/ping || exit 1"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
